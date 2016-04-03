@@ -1,0 +1,27 @@
+name: ${project.name}
+main: com.programmerdan.minecraft.wordbank.WordBank
+author: ProgrammerDan
+authors: []
+version: ${project.version}
+commands:
+  wordbank:
+    description: Shows all discovered word sets, their root, and how many times they were used.
+    usage: /<command> [page]
+    permission: wordbank.godmode
+  showwordbank:
+    description: Given a proper length string, shows the wordbank outcome (if used, also shows how many times used)
+    usage: /<command> [string]
+    permission: wordbank.godmode
+permissions:
+  wordbank.*:
+    description: Gives access to all wordbank features
+    default: op
+    children:
+      wordbank.godmode: true
+      wordbank.default: false
+    wordbank.godmode:
+      description: Allows full inspection of all possible words
+      default: op
+    wordbank.default:
+      description: Allows players to set names using wordbank
+      default: true

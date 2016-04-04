@@ -1,7 +1,7 @@
 package com.programmerdan.minecraft.wordbank;
 
 /**
- * Thin wrapper for underlying function, {@link #process(String[], Object...)}.
+ * Thin wrapper for underlying function, {@link #process(Character[], Object...)}.
  * 
  * @author ProgrammerDan
  */
@@ -15,5 +15,5 @@ public interface CharFunction {
 	 * 		the specific implementing class when deciding what to pass.
 	 * @return A number between 0.0f and 1.0f.
 	 */
-	public float process(String[] input, Object...params);
+	public float process(Character[] input, Object...params);
 }

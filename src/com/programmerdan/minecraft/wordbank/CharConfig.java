@@ -30,7 +30,7 @@ public class CharConfig {
 		
 		for (int a = 0; a < charIndexList.size(); a++) {
 			this.charIndex[a] = charIndexList.get(a);
-			if (this.charIndex[a] > activation_limit) {
+			if (this.charIndex[a] >= activation_limit) {
 				throw new InvalidPluginException("Invalid character configuration, index out of range");
 			}
 		}

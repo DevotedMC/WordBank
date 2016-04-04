@@ -4,12 +4,17 @@ configuration_file_version: 1
 
 wordlist_file: words.txt
 activation_length: 10
+cost:
+  ==: org.bukkit.inventory.ItemStack
+  type: EXP_BOTTLE
+  amount: 10
 color:
   chars: [1, 10]
   function: com.programmerdan.minecraft.wordbank.functions.Modulus
   function_terms:
   - 15
 word:
+  max: 3
   count:
     chars: [2, 5]
     function: com.programmerdan.minecraft.wordbank.functions.LinearMap

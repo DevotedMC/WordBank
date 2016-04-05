@@ -50,7 +50,7 @@ public class Modulus implements CharFunction {
 		int aggregator = 0;
 		
 		for (Character c : input) {
-			byte[] b = input[0].toString().getBytes();
+			byte[] b = c.toString().getBytes();
 			for (int a = 0; a < b.length; a++) {
 				aggregator |= (b[a] << (8*a)); 
 			}

@@ -6,6 +6,7 @@ wordlist_file: words.txt
 activation_length: 10
 add_serial: false
 makers_mark: "Marked Item"
+debug: true
 db:
   host: localhost
   name: wordbank

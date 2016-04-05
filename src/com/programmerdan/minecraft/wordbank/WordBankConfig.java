@@ -20,6 +20,7 @@ public class WordBankConfig {
 	private CharConfig word_count;
 	private CharConfig[] word_config;
 	private String makers_mark;
+	private boolean debug;
 	
 	public WordBankConfig(ConfigurationSection config) throws InvalidPluginException {
 		
@@ -29,6 +30,7 @@ public class WordBankConfig {
 		}
 		
 		this.cost = config.getItemStack("cost", new ItemStack(Material.EXP_BOTTLE, 10));
+		this.debug = config.getBoolean("debug", false);
 		
 		try (InputStream words = WordBank.instance().getResource(config.getString("wordlist_file"))){
 			this.words = new WordList(words);
@@ -83,4 +85,7 @@ public class WordBankConfig {
 		return makers_mark;
 	}
 
+	public boolean isDebug() {
+		return debug;
+	}
 }

@@ -22,50 +22,60 @@ import com.programmerdan.minecraft.wordbank.util.NameConstructor;
 public class ActionListener implements Listener {
 	
 	public void TableTouch(PlayerInteractEvent event) {
+		if (WordBank.config().isDebug()) WordBank.log().info("TableTouch event");
 		if (Action.RIGHT_CLICK_BLOCK != event.getAction()) return;
+		if (WordBank.config().isDebug()) WordBank.log().info("  - is Rightclick");
 		if (event.getPlayer() == null) return;
+		if (WordBank.config().isDebug()) WordBank.log().info("  - has player");
 		
 		Block target = event.getClickedBlock();
-		if (target == null || target.getType() != Material.ENCHANTMENT_TABLE) return;			
+		if (target == null || target.getType() != Material.ENCHANTMENT_TABLE) return;
+		if (WordBank.config().isDebug()) WordBank.log().info("  - is touch Enchantment Table");
 		
 		ItemStack item = event.getItem();
 		if (item == null || !item.hasItemMeta()) return; // no item or item has no custom data
+		if (WordBank.config().isDebug()) WordBank.log().info("  - has meta");
 		
 		ItemMeta meta = item.getItemMeta();
 		
 		if (meta == null || !meta.hasDisplayName()) return; // no meta or no custom name
+		if (WordBank.config().isDebug()) WordBank.log().info("  - has name");
 		
 		if (meta.hasLore()) return; // we use a lore tag to indicate if a custom name has been applied
+		if (WordBank.config().isDebug()) WordBank.log().info("  - has no lore");
 		
 		String curName = meta.getDisplayName();
 		
 		if (curName.length() == WordBank.config().getActivationLength()) {
+			if (WordBank.config().isDebug()) WordBank.log().info("  - is eligible");
 			// we've got a winrar!
 			// Let's check if the player can pay his dues.
 			Inventory pInv = event.getPlayer().getInventory();
 			if (pInv.containsAtLeast(WordBank.config().getCost(), WordBank.config().getCost().getAmount())) {
 				HashMap<Integer, ItemStack> incomplete = pInv.removeItem(WordBank.config().getCost());
 				if (incomplete != null && !incomplete.isEmpty()) {
-					// TODO: Note refund here.
-					// too rich
+					if (WordBank.config().isDebug()) WordBank.log().info("  - lacks enough to pay for it");
 					for (Map.Entry<Integer, ItemStack> cleanup : incomplete.entrySet()) {
 						pInv.addItem(cleanup.getValue());// ignore overflow?
 					}
 				} else {
+					if (WordBank.config().isDebug()) WordBank.log().info("  - Paid and updating item");
 					meta.setDisplayName(NameConstructor.buildName(meta.getDisplayName(), true));
 					ArrayList<String> lore = new ArrayList<String>();
 					lore.add(WordBank.config().getMakersMark());
 					meta.setLore(lore);
 					item.setItemMeta(meta);
-					// TODO: Tell player success
+					event.getPlayer().sendMessage("Applied a new " + WordBank.config().getMakersMark());
 				}
 			}
-			// TODO: Tell player to gtfo
+			event.getPlayer().sendMessage("Insufficient resources! Needs " + WordBank.config().getCost());
 		}
 		return;
 	}
 	
 	public void ItemPrevention(PrepareAnvilEvent event) {
+		if (WordBank.config().isDebug()) WordBank.log().info("ItemPrevention event");
+
 		if (event.getInventory() == null) return;
 		
 		AnvilInventory anvil = event.getInventory();
@@ -97,6 +107,5 @@ public class ActionListener implements Listener {
 				}
 			}
 		}
-		// otherwise, carray on.
 	}
 }

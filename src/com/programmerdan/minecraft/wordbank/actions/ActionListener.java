@@ -1,12 +1,18 @@
 package com.programmerdan.minecraft.wordbank.actions;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
@@ -17,10 +23,19 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.programmerdan.minecraft.wordbank.WordBank;
+import com.programmerdan.minecraft.wordbank.data.WordBankData;
 import com.programmerdan.minecraft.wordbank.util.NameConstructor;
 
+/**
+ * Manages the detection and application of WordBank keys.
+ * 
+ * Prevents the renaming of items that have a new key.
+ * 
+ * @author ProgrammerDan
+ */
 public class ActionListener implements Listener {
 	
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void TableTouch(PlayerInteractEvent event) {
 		if (WordBank.config().isDebug()) WordBank.log().info("TableTouch event");
 		if (Action.RIGHT_CLICK_BLOCK != event.getAction()) return;
@@ -32,16 +47,18 @@ public class ActionListener implements Listener {
 		if (target == null || target.getType() != Material.ENCHANTMENT_TABLE) return;
 		if (WordBank.config().isDebug()) WordBank.log().info("  - is touch Enchantment Table");
 		
+		// no item or item has no custom data
 		ItemStack item = event.getItem();
-		if (item == null || !item.hasItemMeta()) return; // no item or item has no custom data
+		if (item == null || !item.hasItemMeta()) return;
 		if (WordBank.config().isDebug()) WordBank.log().info("  - has meta");
 		
+		// no meta or no custom name
 		ItemMeta meta = item.getItemMeta();
-		
-		if (meta == null || !meta.hasDisplayName()) return; // no meta or no custom name
+		if (meta == null || !meta.hasDisplayName()) return;
 		if (WordBank.config().isDebug()) WordBank.log().info("  - has name");
 		
-		if (meta.hasLore()) return; // we use a lore tag to indicate if a custom name has been applied
+		// we use a lore tag to indicate if a custom name has been applied
+		if (meta.hasLore()) return;
 		if (WordBank.config().isDebug()) WordBank.log().info("  - has no lore");
 		
 		String curName = meta.getDisplayName();
@@ -56,7 +73,8 @@ public class ActionListener implements Listener {
 				if (incomplete != null && !incomplete.isEmpty()) {
 					if (WordBank.config().isDebug()) WordBank.log().info("  - lacks enough to pay for it");
 					for (Map.Entry<Integer, ItemStack> cleanup : incomplete.entrySet()) {
-						pInv.addItem(cleanup.getValue());// ignore overflow?
+						pInv.addItem(cleanup.getValue());
+						// ignore overflow?
 					}
 				} else {
 					if (WordBank.config().isDebug()) WordBank.log().info("  - Paid and updating item");
@@ -66,6 +84,21 @@ public class ActionListener implements Listener {
 					meta.setLore(lore);
 					item.setItemMeta(meta);
 					event.getPlayer().sendMessage("Applied a new " + WordBank.config().getMakersMark());
+					if (WordBank.config().hasDB()) {
+						try {
+							if (WordBank.config().isDebug()) WordBank.log().info("  - Inserting item record");
+							Connection connection = WordBank.data().getConnection();
+							PreparedStatement insert = connection.prepareStatement(WordBankData.insert);
+							insert.setString(1, curName);
+							insert.setString(2, event.getPlayer().getUniqueId().toString());
+							insert.setString(3, item.getType().toString());
+							insert.executeUpdate();
+							insert.close();
+							connection.close();
+						} catch (SQLException se) {
+							WordBank.log().log(Level.WARNING, "Failed to insert key utilization", se);
+						}
+					}
 				}
 			}
 			event.getPlayer().sendMessage("Insufficient resources! Needs " + WordBank.config().getCost());
@@ -73,6 +106,7 @@ public class ActionListener implements Listener {
 		return;
 	}
 	
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void ItemPrevention(PrepareAnvilEvent event) {
 		if (WordBank.config().isDebug()) WordBank.log().info("ItemPrevention event");
 

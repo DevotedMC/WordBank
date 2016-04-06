@@ -9,9 +9,12 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.InvalidPluginException;
 
+import com.zaxxer.hikari.HikariConfig;
+
 public class WordBankConfig {
 	private static int expected_config_level = 1;
 	
+	private HikariConfig db_config;
 	private WordList words;
 	private int activation_length;
 	private ItemStack cost;
@@ -47,6 +50,24 @@ public class WordBankConfig {
 		this.word_config = new CharConfig[this.word_max];
 		for (int a = 0; a < this.word_max; a++) {
 			this.word_config[a] = new CharConfig(config.getConfigurationSection("word." + (a+1)), activation_length);
+		}
+		// dbconfig 
+		this.db_config = null;
+		ConfigurationSection db = config.getConfigurationSection("db");
+		if (db != null && db.contains("user") && db.contains("name")) {
+			this.db_config = new HikariConfig();
+			this.db_config.setJdbcUrl("jdbc:" + db.getString("driver", "mysql") + "://" + db.getString("host", "localhost") + ":" +
+					db.getString("port", "3306") + "/" + db.getString("name"));
+			
+			this.db_config.setConnectionTimeout(3000l);
+			this.db_config.setIdleTimeout(1800000l);
+			this.db_config.setMaxLifetime(7200000l);
+			this.db_config.setMaximumPoolSize(2);
+			this.db_config.setUsername(db.getString("user"));
+			this.db_config.setPassword(db.getString("password"));
+			this.db_config.addDataSourceProperty("cachePrepStmts", "true");
+			this.db_config.addDataSourceProperty("prepStmtCacheSize", "10");
+			this.db_config.addDataSourceProperty("prepStmtCacheSqlLimit", "256");
 		}
 	}
 
@@ -87,5 +108,13 @@ public class WordBankConfig {
 
 	public boolean isDebug() {
 		return debug;
+	}
+	
+	public boolean hasDB() {
+		return db_config != null;
+	}
+	
+	public HikariConfig database() {
+		return this.db_config;
 	}
 }

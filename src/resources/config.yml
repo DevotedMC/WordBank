@@ -8,9 +8,10 @@ add_serial: false
 makers_mark: "Marked Item"
 debug: true
 db:
+  driver: mysql
   host: localhost
   name: wordbank
-  port: 6907
+  port: 3306
   user: root
   password: ''
 cost:

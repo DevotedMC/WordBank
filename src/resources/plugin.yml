@@ -5,13 +5,14 @@ authors: []
 version: ${project.version}
 commands:
   wordbank:
-    description: Shows all discovered word sets, their root, and how many times they were used.
-    usage: /<command> [page]
+    description: |
+      Shows all utilized keys & how many times used, 
+      or for a specific key how many times and by how many people they were used.
+    usage: |
+      /<command> [page]
+      /<command> [string] [page]
     permission: wordbank.godmode
-  showwordbank:
-    description: Given a proper length string, shows the wordbank outcome (if used, also shows how many times used)
-    usage: /<command> [string]
-    permission: wordbank.godmode
+
 permissions:
   wordbank.*:
     description: Gives access to all wordbank features

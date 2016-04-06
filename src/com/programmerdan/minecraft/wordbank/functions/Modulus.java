@@ -1,8 +1,10 @@
 package com.programmerdan.minecraft.wordbank.functions;
 
 import java.security.InvalidParameterException;
+import java.util.logging.Level;
 
 import com.programmerdan.minecraft.wordbank.CharFunction;
+import com.programmerdan.minecraft.wordbank.WordBank;
 
 /**
  * Uses an aggregator and modulo to form a value between 0.0f and 1.0f
@@ -54,10 +56,17 @@ public class Modulus implements CharFunction {
 			for (int a = 0; a < b.length; a++) {
 				aggregator |= (b[a] << (8*a)); 
 			}
+			if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Modulo: {0} % {1}",
+					new Object[]{aggregator, mod});
 			aggregator %= mod;
 		}
 		
-		return (float) aggregator / (float) mod;
+		float q = (float) aggregator / (float) mod;
+		
+		if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Modulo: {0} / {1} = {2}",
+				new Object[]{aggregator, mod, q});
+		
+		return q;
 		
 	}
 

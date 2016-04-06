@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
@@ -72,36 +73,53 @@ public class ActionListener implements Listener {
 				HashMap<Integer, ItemStack> incomplete = pInv.removeItem(WordBank.config().getCost());
 				if (incomplete != null && !incomplete.isEmpty()) {
 					if (WordBank.config().isDebug()) WordBank.log().info("  - lacks enough to pay for it");
+					
 					for (Map.Entry<Integer, ItemStack> cleanup : incomplete.entrySet()) {
 						pInv.addItem(cleanup.getValue());
 						// ignore overflow?
 					}
 				} else {
-					if (WordBank.config().isDebug()) WordBank.log().info("  - Paid and updating item");
-					meta.setDisplayName(NameConstructor.buildName(meta.getDisplayName(), true));
-					ArrayList<String> lore = new ArrayList<String>();
-					lore.add(WordBank.config().getMakersMark());
-					meta.setLore(lore);
-					item.setItemMeta(meta);
-					event.getPlayer().sendMessage("Applied a new " + WordBank.config().getMakersMark());
-					if (WordBank.config().hasDB()) {
-						try {
-							if (WordBank.config().isDebug()) WordBank.log().info("  - Inserting item record");
-							Connection connection = WordBank.data().getConnection();
-							PreparedStatement insert = connection.prepareStatement(WordBankData.insert);
-							insert.setString(1, curName);
-							insert.setString(2, event.getPlayer().getUniqueId().toString());
-							insert.setString(3, item.getType().toString());
-							insert.executeUpdate();
-							insert.close();
-							connection.close();
-						} catch (SQLException se) {
-							WordBank.log().log(Level.WARNING, "Failed to insert key utilization", se);
+					try {
+						if (WordBank.config().isDebug()) WordBank.log().info("  - Paid and updating item");
+						meta.setDisplayName(NameConstructor.buildName(meta.getDisplayName(), true));
+						ArrayList<String> lore = new ArrayList<String>();
+						lore.add(WordBank.config().getMakersMark());
+						meta.setLore(lore);
+						item.setItemMeta(meta);
+						
+						event.getPlayer().sendMessage(String.format("%sApplied a new %s of %s %sto the %s",
+								ChatColor.WHITE, WordBank.config().getMakersMark(), 
+								meta.getDisplayName(), ChatColor.WHITE,
+								item.getType().toString()));
+						
+						if (WordBank.config().hasDB()) {
+							try {
+								if (WordBank.config().isDebug()) WordBank.log().info("  - Inserting item record");
+								Connection connection = WordBank.data().getConnection();
+								PreparedStatement insert = connection.prepareStatement(WordBankData.insert);
+								insert.setString(1, curName);
+								insert.setString(2, event.getPlayer().getUniqueId().toString());
+								insert.setString(3, item.getType().toString());
+								insert.executeUpdate();
+								insert.close();
+								connection.close();
+							} catch (SQLException se) {
+								WordBank.log().log(Level.WARNING, "Failed to insert key utilization", se);
+							}
 						}
+					} catch (Exception e) {
+						WordBank.log().log(Level.WARNING, "Something went very wrong while renaming", e);
+						event.getPlayer().sendMessage(String.format("Mystic renaming of %s has %sfailed%s. %sPlease report via /helpop.",
+								item.getType().toString(), ChatColor.ITALIC, ChatColor.RESET, ChatColor.AQUA));
+						// no refund to prevent gaming of glitches
 					}
+					return;
 				}
 			}
-			event.getPlayer().sendMessage("Insufficient resources! Needs " + WordBank.config().getCost());
+			event.getPlayer().sendMessage(String.format("%sYou need %d of %s to create a %s",
+					ChatColor.RED, WordBank.config().getCost().getAmount(),
+					WordBank.config().getCost().getType().toString(),
+					WordBank.config().getMakersMark()));
 		}
 		return;
 	}
@@ -127,19 +145,23 @@ public class ActionListener implements Listener {
 		if (meta0 == null) return; // huh?!
 		if (meta0 != null && !meta0.hasDisplayName()) return; // neither has name
 		
+		if (meta0 != null && !meta0.hasLore()) return; // neither has lore
+		
 		// not a marked item?
 		if (meta0 != null && meta0.hasLore() && !meta0.getLore().contains(WordBank.config().getMakersMark())) return;
+
+		if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO, "Repairing a {0}", WordBank.config().getMakersMark());
 		
 		// check for rename
 		ItemMeta resultMeta = result.getItemMeta();
+		if (resultMeta == null) return; // something weird?
+		
+		if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO, "  - output Meta Display Name is {0}", resultMeta.getDisplayName());
+		if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO, "  - marked Meta Display Name is {0}", meta0.getDisplayName());
 		
 		if (!resultMeta.hasDisplayName() || !resultMeta.getDisplayName().equals(meta0.getDisplayName())) {
-			event.setResult(null);
-			for (HumanEntity he : event.getViewers()) {
-				if (he != null) {
-					he.sendMessage("Cannot rename a " + WordBank.config().getMakersMark());
-				}
-			}
+			resultMeta.setDisplayName(meta0.getDisplayName());
+			result.setItemMeta(resultMeta);
 		}
 	}
 }

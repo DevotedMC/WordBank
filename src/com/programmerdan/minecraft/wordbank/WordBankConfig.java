@@ -1,5 +1,7 @@
 package com.programmerdan.minecraft.wordbank;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -35,10 +37,13 @@ public class WordBankConfig {
 		this.cost = config.getItemStack("cost", new ItemStack(Material.EXP_BOTTLE, 10));
 		this.debug = config.getBoolean("debug", false);
 		
-		try (InputStream words = WordBank.instance().getResource(config.getString("wordlist_file"))){
+		try (InputStream words = new FileInputStream(
+				new File(WordBank.instance().getDataFolder(),config.getString("wordlist_file")))) {
 			this.words = new WordList(words);
 		} catch (IOException e) {
 			WordBank.log().log(Level.SEVERE, "Failed to load word list.", e);
+		} catch (NullPointerException npe) {
+			WordBank.log().log(Level.SEVERE, "Failed to load word list.", npe);
 		}
 		
 		this.activation_length = config.getInt("activation_length", 10);
@@ -49,7 +54,7 @@ public class WordBankConfig {
 		this.word_count = new CharConfig(config.getConfigurationSection("word.count"), activation_length);
 		this.word_config = new CharConfig[this.word_max];
 		for (int a = 0; a < this.word_max; a++) {
-			this.word_config[a] = new CharConfig(config.getConfigurationSection("word." + (a+1)), activation_length);
+			this.word_config[a] = new CharConfig(config.getConfigurationSection("word." + a), activation_length);
 		}
 		// dbconfig 
 		this.db_config = null;

@@ -2,14 +2,17 @@ package com.programmerdan.minecraft.wordbank.functions;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import org.apache.commons.lang.ArrayUtils;
 
 import com.programmerdan.minecraft.wordbank.CharFunction;
+import com.programmerdan.minecraft.wordbank.WordBank;
 
 /**
  * Aggregates the bytes of the characters used as input and forms a message digest using those
@@ -55,7 +58,7 @@ public class HashMap implements CharFunction {
 			}
 		}
 		
-		byte[] arrz = ArrayUtils.toPrimitive((Byte[]) inputs.toArray());
+		byte[] arrz = ArrayUtils.toPrimitive(inputs.toArray(new Byte[0]));
 		
 		try {
 			MessageDigest md = MessageDigest.getInstance(param);
@@ -63,13 +66,18 @@ public class HashMap implements CharFunction {
 			
 			byte[] arrc = new byte[outc.length];
 			Arrays.fill(arrc, (byte) 0xFF);
-			BigInteger max = new BigInteger(arrc);
-			max.clearBit(0); // force positive
-			BigInteger val = new BigInteger(outc);
-			val.clearBit(0); // force positive
+			BigInteger max = new BigInteger(1, arrc);
+			//max.clearBit(0); // force positive
+			BigInteger val = new BigInteger(1, outc);
+			//val.clearBit(0); // force positive
 			BigDecimal maxD = new BigDecimal(max);
 			BigDecimal valD = new BigDecimal(val);
-			return valD.divide(maxD).floatValue();
+			if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Hash: {0} / {1}",
+					new Object[]{valD.toPlainString(), maxD.toPlainString()});
+			float q = valD.divide(maxD, 10, RoundingMode.HALF_EVEN).floatValue();
+			if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Hash: {0} / {1} = {2}",
+					new Object[]{valD.toPlainString(), maxD.toPlainString(), q});
+			return q;
 		} catch (NoSuchAlgorithmException e) {
 			throw new IllegalArgumentException("Failed to instantiate cryptographic function " + param, e);
 		}

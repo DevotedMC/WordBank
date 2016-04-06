@@ -17,6 +17,7 @@ public class WordList {
 	private Vector<String> words;
 	
 	public WordList(InputStream words) {
+		this.words = new Vector<String>();
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(words));
 			String word = br.readLine();
@@ -32,7 +33,7 @@ public class WordList {
 	public String getWord(float which) {
 		if (which > 1.0f) which = 1.0f;
 		if (which < 0.0f) which = 0.0f;
-		int q = (int) ((float)words.size() * which);
+		int q = (int) ((float)(words.size()-1) * which);
 		return words.get(q);
 	}
 }

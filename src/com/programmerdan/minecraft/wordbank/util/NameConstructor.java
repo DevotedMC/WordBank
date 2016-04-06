@@ -30,7 +30,7 @@ public class NameConstructor {
 		// Second, compute # of words.
 		float howManyWords = executeConfig(WordBank.config().getWordCount(), key);
 		
-		int actualWords = Math.max(1, (int) (howManyWords * WordBank.config().getWordMax()));
+		int actualWords = 1 + (int) (howManyWords * (WordBank.config().getWordMax()-1) );
 		
 		StringBuilder name = new StringBuilder();
 		name.append(org.bukkit.ChatColor.getByChar(Integer.toString((int)(15 * whichColor), 16)));

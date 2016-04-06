@@ -2,13 +2,16 @@ package com.programmerdan.minecraft.wordbank.functions;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.Vector;
+import java.util.logging.Level;
 
 import org.apache.commons.lang.ArrayUtils;
 
 import com.programmerdan.minecraft.wordbank.CharFunction;
+import com.programmerdan.minecraft.wordbank.WordBank;
 
 /**
  * Fairly naive process that maps the character data onto a number whose bitlength depends on the
@@ -60,12 +63,16 @@ public class LinearMap implements CharFunction {
 		
 		byte[] arrz = new byte[inputs.size()];
 		Arrays.fill(arrz, (byte) 0xFF);
-		BigInteger max = new BigInteger(arrz);
-		max.clearBit(0); // force positive
-		BigInteger val = new BigInteger(ArrayUtils.toPrimitive((Byte[]) inputs.toArray()));
-		val.clearBit(0); // force positive
+		BigInteger max = new BigInteger(1, arrz);
+		//max.clearBit(0); // force positive
+		BigInteger val = new BigInteger(1, ArrayUtils.toPrimitive(inputs.toArray(new Byte[0])));
+		//val.clearBit(0); // force positive
 		BigDecimal maxD = new BigDecimal(max);
 		BigDecimal valD = new BigDecimal(val);
-		return valD.divide(maxD).floatValue();
+		
+		float q = valD.divide(maxD, 10, RoundingMode.HALF_EVEN).floatValue();
+		if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Linear: {0} / {1} = {2}",
+				new Object[]{valD.toPlainString(), maxD.toPlainString(), q});
+		return q;
 	}
 }

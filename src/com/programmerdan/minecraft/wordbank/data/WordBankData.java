@@ -17,23 +17,23 @@ public class WordBankData {
 	public static final String init =
 			"CREATE TABLE IF NOT EXISTS wordbank_utilization (" +
 			"  id BIGINT NOT NULL AUTO_INCREMENT," +
-			"  when TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
-			"  key VARCHAR(32) NOT NULL," +
+			"  event TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP," +
+			"  wbkey VARCHAR(32) NOT NULL," +
 			"  uuid VARCHAR(36) NOT NULL," +
 			"  target VARCHAR(50) NOT NULL," +
 			"  CONSTRAINT pk_wordbank PRIMARY KEY (id)," +
-			"  INDEX pk_whatwhowhat USING BTREE (key, uuid, target)" +
+			"  INDEX pk_whatwhowhat USING BTREE (wbkey, uuid, target)" +
 			");";
 	
 	public static final String insert =
-			"INSERT INTO wordbank_utilization (key, uuid, target) VALUES (?, ?, ?);";
+			"INSERT INTO wordbank_utilization (wbkey, uuid, target) VALUES (?, ?, ?);";
 	
 	public static final String keys = 
-			"SELECT key, count(*) AS cnt FROM wordbank_utilization GROUP BY key LIMIT ? OFFSET ?;";
+			"SELECT wbkey, count(*) AS cnt FROM wordbank_utilization GROUP BY wbkey LIMIT ? OFFSET ?;";
 	
 	public static final String key =
-			"SELECT uuid, count(*) AS usage, count(DISTINCT target) AS targets " +
-			"  FROM wordbank_utilization WHERE key = ? GROUP BY uuid LIMIT ? OFFSET ?;";
+			"SELECT uuid, count(*) AS cnt, count(DISTINCT target) AS targets " +
+			"  FROM wordbank_utilization WHERE wbkey = ? GROUP BY uuid LIMIT ? OFFSET ?;";
 	
 	private HikariDataSource datasource;
 	

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.logging.Level;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -36,10 +37,10 @@ public class CommandListener implements CommandExecutor {
 				int temp = Integer.valueOf(args[args.length - 1]);
 				page = temp;
 				
-				key = String.join(" ", Arrays.copyOfRange(args, 0, args.length - 1));
+				key = StringUtils.join(Arrays.copyOfRange(args, 0, args.length - 1), " ");
 			} catch (NumberFormatException nfe) {
 				page = 0;
-				key = String.join(" ", Arrays.copyOf(args, args.length));
+				key = StringUtils.join(Arrays.copyOf(args, args.length), " ");
 			}
 		}
 		

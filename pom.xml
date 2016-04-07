@@ -38,14 +38,11 @@
       </plugin>
     </plugins>
 
-    <sourceDirectory>${basedir}/src</sourceDirectory>
-    
     <resources>
       <resource>
-        <directory>${basedir}/src/resources</directory>
+        <directory>${basedir}/src/main/resources</directory>
         <includes>
           <include>*.yml</include>
-          <include>*.md</include>
         </includes>
         <filtering>true</filtering>
       </resource>

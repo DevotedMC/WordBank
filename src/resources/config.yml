@@ -4,6 +4,8 @@ configuration_file_version: 1
 
 wordlist_file: words.txt
 activation_length: 10
+activate_any_length: true
+padding: '⸗'
 add_serial: false
 makers_mark: "Marked Item"
 debug: false

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -31,12 +32,14 @@ public class CommandListener implements CommandExecutor {
 				key = args[0];
 			}
 		} else if (args.length > 1) {
-			key = args[0];
 			try {
-				int temp = Integer.valueOf(args[1]);
+				int temp = Integer.valueOf(args[args.length - 1]);
 				page = temp;
+				
+				key = String.join(" ", Arrays.copyOfRange(args, 0, args.length - 1));
 			} catch (NumberFormatException nfe) {
 				page = 0;
+				key = String.join(" ", Arrays.copyOf(args, args.length));
 			}
 		}
 		
@@ -58,9 +61,10 @@ public class CommandListener implements CommandExecutor {
 				sender.sendMessage(String.format("Listing all keys:    %s(Page %d)",
 						ChatColor.BLUE, page));
 				while (rs.next()) {
-					sender.sendMessage(String.format("%s%10s %s: %sUsed %d times",
+					sender.sendMessage(String.format("%s%10s %s-> %s%s %sUsed %d times",
 							ChatColor.GOLD, rs.getString(1), ChatColor.GRAY,
-							ChatColor.WHITE, rs.getInt(2)));
+							ChatColor.AQUA, rs.getString(2),
+							ChatColor.WHITE, rs.getInt(3)));
 				}
 				rs.close();
 				statement.close();

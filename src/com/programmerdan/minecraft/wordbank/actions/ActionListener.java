@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -59,12 +58,12 @@ public class ActionListener implements Listener {
 		if (WordBank.config().isDebug()) WordBank.log().info("  - has name");
 		
 		// we use a lore tag to indicate if a custom name has been applied
-		if (meta.hasLore()) return;
-		if (WordBank.config().isDebug()) WordBank.log().info("  - has no lore");
+		if (meta.hasLore() && meta.getLore().contains(WordBank.config().getMakersMark())) return;
+		if (WordBank.config().isDebug()) WordBank.log().info("  - has no Makers Mark lore");
 		
 		String curName = meta.getDisplayName();
 		
-		if (curName.length() == WordBank.config().getActivationLength()) {
+		if (WordBank.config().isActivateAnyLength() || curName.length() == WordBank.config().getActivationLength()) {
 			if (WordBank.config().isDebug()) WordBank.log().info("  - is eligible");
 			// we've got a winrar!
 			// Let's check if the player can pay his dues.
@@ -81,7 +80,21 @@ public class ActionListener implements Listener {
 				} else {
 					try {
 						if (WordBank.config().isDebug()) WordBank.log().info("  - Paid and updating item");
-						meta.setDisplayName(NameConstructor.buildName(meta.getDisplayName(), true));
+						
+						if (curName.length() > WordBank.config().getActivationLength()) {
+							curName = curName.substring(0, WordBank.config().getActivationLength());
+						} else if (curName.length() < WordBank.config().getActivationLength()) {
+							int diff = WordBank.config().getActivationLength() - curName.length();
+							curName = curName.concat( new String(new char[diff])
+									.replaceAll("\0", WordBank.config().getPadding()));
+						}
+						String newName = NameConstructor.buildName(curName, true);
+						
+						if (WordBank.config().isDebug()) WordBank.log().log(
+								Level.INFO, "  - Using key {0} to generate {1}", 
+								new Object[]{curName, newName});
+
+						meta.setDisplayName(newName);
 						ArrayList<String> lore = new ArrayList<String>();
 						lore.add(WordBank.config().getMakersMark());
 						meta.setLore(lore);
@@ -100,6 +113,7 @@ public class ActionListener implements Listener {
 								insert.setString(1, curName);
 								insert.setString(2, event.getPlayer().getUniqueId().toString());
 								insert.setString(3, item.getType().toString());
+								insert.setString(4, newName);
 								insert.executeUpdate();
 								insert.close();
 								connection.close();

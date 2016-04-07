@@ -19,6 +19,8 @@ public class WordBankConfig {
 	private HikariConfig db_config;
 	private WordList words;
 	private int activation_length;
+	private boolean activate_any_length;
+	private String padding;
 	private ItemStack cost;
 	private CharConfig color;
 	private int word_max;
@@ -47,6 +49,8 @@ public class WordBankConfig {
 		}
 		
 		this.activation_length = config.getInt("activation_length", 10);
+		this.activate_any_length = config.getBoolean("activate_any_length", false);
+		this.padding = config.getString("padding", " ").substring(0, 1);
 		
 		this.word_max = config.getInt("word.max", 3);
 		this.makers_mark = config.getString("makers_mark", "Marked Item");
@@ -82,6 +86,14 @@ public class WordBankConfig {
 
 	public int getActivationLength() {
 		return activation_length;
+	}
+	
+	public boolean isActivateAnyLength() {
+		return activate_any_length;
+	}
+	
+	public String getPadding(){
+		return padding;
 	}
 
 	public ItemStack getCost() {

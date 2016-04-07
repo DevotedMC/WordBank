@@ -67,13 +67,10 @@ public class HashMap implements CharFunction {
 			byte[] arrc = new byte[outc.length];
 			Arrays.fill(arrc, (byte) 0xFF);
 			BigInteger max = new BigInteger(1, arrc);
-			//max.clearBit(0); // force positive
 			BigInteger val = new BigInteger(1, outc);
-			//val.clearBit(0); // force positive
 			BigDecimal maxD = new BigDecimal(max);
 			BigDecimal valD = new BigDecimal(val);
-			if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Hash: {0} / {1}",
-					new Object[]{valD.toPlainString(), maxD.toPlainString()});
+
 			float q = valD.divide(maxD, 10, RoundingMode.HALF_EVEN).floatValue();
 			if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Hash: {0} / {1} = {2}",
 					new Object[]{valD.toPlainString(), maxD.toPlainString(), q});

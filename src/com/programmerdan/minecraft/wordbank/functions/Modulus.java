@@ -61,7 +61,7 @@ public class Modulus implements CharFunction {
 			aggregator %= mod;
 		}
 		
-		float q = (float) aggregator / (float) mod;
+		float q = (float) aggregator / (float) (mod - 1);
 		
 		if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Modulo: {0} / {1} = {2}",
 				new Object[]{aggregator, mod, q});

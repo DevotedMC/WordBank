@@ -21,15 +21,16 @@ public class WordBankData {
 			"  wbkey VARCHAR(32) NOT NULL," +
 			"  uuid VARCHAR(36) NOT NULL," +
 			"  target VARCHAR(50) NOT NULL," +
+			"  wbname VARCHAR(150) NOT NULL," +
 			"  CONSTRAINT pk_wordbank PRIMARY KEY (id)," +
 			"  INDEX pk_whatwhowhat USING BTREE (wbkey, uuid, target)" +
 			");";
 	
 	public static final String insert =
-			"INSERT INTO wordbank_utilization (wbkey, uuid, target) VALUES (?, ?, ?);";
+			"INSERT INTO wordbank_utilization (wbkey, uuid, target, wbname) VALUES (?, ?, ?, ?);";
 	
 	public static final String keys = 
-			"SELECT wbkey, count(*) AS cnt FROM wordbank_utilization GROUP BY wbkey LIMIT ? OFFSET ?;";
+			"SELECT wbkey, wbname, count(*) AS cnt FROM wordbank_utilization GROUP BY wbkey LIMIT ? OFFSET ?;";
 	
 	public static final String key =
 			"SELECT uuid, count(*) AS cnt, count(DISTINCT target) AS targets " +

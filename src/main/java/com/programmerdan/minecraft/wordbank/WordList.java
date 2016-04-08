@@ -15,8 +15,13 @@ import java.util.logging.Level;
  */
 public class WordList {
 	private Vector<String> words;
+	private WordBank plugin;
 	
 	public WordList(InputStream words) {
+		this(words, null);
+	}
+	public WordList(InputStream words, WordBank plugin){
+		this.plugin = plugin;
 		this.words = new Vector<String>();
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(words));
@@ -26,8 +31,12 @@ public class WordList {
 				word = br.readLine();
 			}
 		} catch (IOException ioe) {
-			WordBank.log().log(Level.SEVERE, "Failed to load word list!", ioe);
+			plugin().logger().log(Level.SEVERE, "Failed to load word list!", ioe);
 		}
+	}
+	
+	protected WordBank plugin() {
+		return this.plugin == null ? WordBank.instance() : this.plugin; 
 	}
 	
 	public String getWord(float which) {

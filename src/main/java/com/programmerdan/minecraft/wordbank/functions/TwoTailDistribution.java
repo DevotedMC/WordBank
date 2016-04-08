@@ -3,13 +3,13 @@ package com.programmerdan.minecraft.wordbank.functions;
 import com.programmerdan.minecraft.wordbank.CharFunction;
 import com.programmerdan.minecraft.wordbank.WordBank;
 
-public class NormalDistribution extends CharFunction {
+public class TwoTailDistribution extends CharFunction {
 
-	public NormalDistribution() {
+	public TwoTailDistribution() {
 		super(null);
 	}
 	
-	public NormalDistribution(WordBank plugin) {
+	public TwoTailDistribution(WordBank plugin) {
 		super(plugin);
 	}
 
@@ -29,7 +29,7 @@ public class NormalDistribution extends CharFunction {
 	}
 
 	/**
-	 * Filter an assumed uniform input into a normal/gaussian output, with no skew.
+	 * Filter an assumed uniform input into a two tailed (high on bottom and top) output, with no skew.
 	 * 
 	 * @param input Character sequence, first passed through HashMap function.
 	 * @param param The Hashing function to use.
@@ -38,16 +38,18 @@ public class NormalDistribution extends CharFunction {
 	public float process(Character[] input, String param) {
 		double q = (double) new HashMap().process(input, param);
 		
-		// q should be relatively uniform.
+		// one option///
+		//y = ( e ^ (-.5 * ( ( x - .5 ) /.1675 ) ^ 2 ) )
+		// see: https://www.wolframalpha.com/input/?i=y+%3D+(+e+%5E+(-.5+*+(+(+x+-+.5+)+%2F.1675+)+%5E+2+)+)+,+x+%3D+0...1
+		//double outcome = Math.exp( -0.5d * Math.pow(( q - .5d ) / 0.1675d, 2.0d ) );
 		
-		//solve for x where 1=.25+(4x)-(4x)^2+(4x)^3-(4x)^4+(4x)^5
-		// x = 0.898294, y = 1
-		//solve for x where 0=.25+(x)-(x)^2+(x)^3-(x)^4+(x)^5
-		// x = -0.200051, y = 0
+		// actual: (approximate integral of above)
+		//y = 1 / (1+e^(-(x-.5)*10))
+		// see: http://www.wolframalpha.com/input/?i=y+%3D+1+%2F+(1%2Be%5E(-(x-.5)*10))+and+x%3D0...1
+		double outcome = 1.0d / (1.0d + Math.exp( -10.0d * (q - 0.5d) ) );
 		
-		double x = (q * (0.898284+.200051)) - 0.200051;
-		
-		double outcome = Math.pow(x, 5d)-Math.pow(x, 4d)+Math.pow(x,3d)-Math.pow(x,2d)+x+0.25;
+		/*if (plugin().config().isDebug()) plugin().logger().log(Level.INFO,"NormalDistro: {0} = {1}",
+				new Object[]{q, outcome});*/
 		
 		return (float) (outcome < 0.0d ? 0.0f : (outcome > 1.0d ? 1.0f : outcome));
 	}

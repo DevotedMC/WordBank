@@ -13,6 +13,14 @@ import com.programmerdan.minecraft.wordbank.actions.ActionListener;
 import com.programmerdan.minecraft.wordbank.actions.CommandListener;
 import com.programmerdan.minecraft.wordbank.data.WordBankData;
 
+/**
+ * See README.md for details. Simple Bukkit plugin using some Cool Stuff under the hood.
+ *
+ * Designed on 1.9 but should be backwards compatible with 1.8.
+ * 
+ * @author ProgrammerDan
+ * @since April 8 2016
+ */
 public class WordBank extends JavaPlugin {
 	private static WordBank plugin;
 	private WordBankConfig config;
@@ -50,13 +58,16 @@ public class WordBank extends JavaPlugin {
 	public static WordBank instance() {
 		return plugin;
 	}
-	public static Logger log() {
-		return WordBank.plugin.getLogger();
+	public Logger logger() {
+		return getLogger();
 	}
-	public static WordBankConfig config() {
-		return WordBank.instance().config;
+	public void log(Level level, String message, Object...objects){
+		getLogger().log(level, message, objects);;
 	}
-	public static WordBankData data() {
-		return WordBank.instance().data;
+	public WordBankConfig config() {
+		return config;
+	}
+	public WordBankData data() {
+		return data;
 	}
 }

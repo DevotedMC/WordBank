@@ -38,13 +38,19 @@ public class WordBankData {
 	
 	private HikariDataSource datasource;
 	
+	private WordBank plugin;
 	/**
 	 * Sets up a new WordBank using the standing configuration; attempts to create the
 	 * database if it doesn't already exist.
 	 */
 	public WordBankData() {
-		if (WordBank.config().hasDB()) {
-			this.datasource = new HikariDataSource(WordBank.config().database());
+		this(null);
+	}
+	
+	public WordBankData(WordBank plugin) {
+		this.plugin = plugin;
+		if (plugin().config().hasDB()) {
+			this.datasource = new HikariDataSource(plugin().config().database());
 			
 			try {
 				Connection connection = getConnection();
@@ -53,11 +59,15 @@ public class WordBankData {
 				statement.close();
 				connection.close();
 			} catch (SQLException se) {
-				WordBank.log().log(Level.SEVERE, "Unable to initialize Database", se);
+				plugin().logger().log(Level.SEVERE, "Unable to initialize Database", se);
 			}
 		} else {
 			this.datasource = null;
 		}
+	}
+	
+	protected WordBank plugin() {
+		return this.plugin == null ? WordBank.instance() : this.plugin; 
 	}
 	
 	public Connection getConnection() throws SQLException {

@@ -9,7 +9,6 @@ import com.programmerdan.minecraft.wordbank.WordBank;
  *
  */
 public class NameConstructor {
-	
 	/**
 	 * Constructing a name is a several step process.
 	 * 
@@ -23,14 +22,23 @@ public class NameConstructor {
 	 * @return The converted key.
 	 */
 	public static String buildName(String key, boolean mark) {
+		return buildName(key, mark, WordBank.instance());
+	}
+
+	/**
+	 * Expansion for {@link #buildName(String, boolean)} allowing specification of WordBank instance.
+	 * 
+	 * @param plugin the WordBank instance to use. Good for unit testing.
+	 */
+	public static String buildName(String key, boolean mark, WordBank plugin) {
 		// TODO: add mark storage; mark is ignored for now, tbd.
 		
 		// First, compute color.
-		float whichColor = executeConfig(WordBank.config().getColor(), key);
+		float whichColor = executeConfig(plugin.config().getColor(), key);
 		// Second, compute # of words.
-		float howManyWords = executeConfig(WordBank.config().getWordCount(), key);
+		float howManyWords = executeConfig(plugin.config().getWordCount(), key);
 		
-		int actualWords = 1 + (int) Math.round(howManyWords * (WordBank.config().getWordMax()-1) );
+		int actualWords = 1 + (int) Math.round(howManyWords * (plugin.config().getWordMax()-1) );
 		
 		StringBuilder name = new StringBuilder();
 		name.append(org.bukkit.ChatColor.getByChar(Integer.toString((int)(15 * whichColor), 16)));
@@ -38,8 +46,8 @@ public class NameConstructor {
 			if (nWord > 0) { 
 				name.append(" ");
 			}
-			name.append(WordBank.config().getWords().getWord(
-					executeConfig(WordBank.config().getWordConfig(nWord), key)
+			name.append(plugin.config().getWords().getWord(
+					executeConfig(plugin.config().getWordConfig(nWord), key)
 				));
 		}
 		

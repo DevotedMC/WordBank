@@ -18,6 +18,19 @@ import com.programmerdan.minecraft.wordbank.data.WordBankData;
 
 public class CommandListener implements CommandExecutor {
 
+	private WordBank plugin;
+	
+	public CommandListener() {
+		plugin = null;
+	}
+	public CommandListener(WordBank plugin) {
+		this.plugin = plugin;
+	}
+	
+	protected WordBank plugin() {
+		return this.plugin == null ? WordBank.instance() : this.plugin; 
+	}
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		int page = 0;
@@ -44,7 +57,7 @@ public class CommandListener implements CommandExecutor {
 			}
 		}
 		
-		if (page < 0 || (key != null && key.length() != WordBank.config().getActivationLength())) {
+		if (page < 0 || (key != null && key.length() != plugin().config().getActivationLength())) {
 			return false;
 		}
 		
@@ -54,7 +67,7 @@ public class CommandListener implements CommandExecutor {
 		
 		if (key == null) {
 			try {
-				Connection connection = WordBank.data().getConnection();
+				Connection connection = plugin().data().getConnection();
 				PreparedStatement statement = connection.prepareStatement(WordBankData.keys);
 				statement.setInt(1, count);
 				statement.setInt(2, page * count);
@@ -71,11 +84,11 @@ public class CommandListener implements CommandExecutor {
 				statement.close();
 				connection.close();
 			} catch (SQLException se) {
-				WordBank.log().log(Level.WARNING, "Failed to retrieve data!", se);
+				plugin().logger().log(Level.WARNING, "Failed to retrieve data!", se);
 			}
 		} else {
 			try {
-				Connection connection = WordBank.data().getConnection();
+				Connection connection = plugin().data().getConnection();
 				PreparedStatement statement = connection.prepareStatement(WordBankData.key);
 				statement.setString(1, key);
 				statement.setInt(2, count);
@@ -92,7 +105,7 @@ public class CommandListener implements CommandExecutor {
 				statement.close();
 				connection.close();				
 			} catch (SQLException se) {
-				WordBank.log().log(Level.WARNING, "Failed to retrieve key data!", se);
+				plugin().logger().log(Level.WARNING, "Failed to retrieve key data!", se);
 			}
 		}
 		

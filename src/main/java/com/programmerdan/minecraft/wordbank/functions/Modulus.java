@@ -1,6 +1,5 @@
 package com.programmerdan.minecraft.wordbank.functions;
 
-import java.security.InvalidParameterException;
 import java.util.logging.Level;
 
 import com.programmerdan.minecraft.wordbank.CharFunction;
@@ -12,7 +11,15 @@ import com.programmerdan.minecraft.wordbank.WordBank;
  * @author ProgrammerDan
  *
  */
-public class Modulus implements CharFunction {
+public class Modulus extends CharFunction {
+
+	public Modulus() {
+		super(null);
+	}
+
+	public Modulus(WordBank plugin) {
+		super(plugin);
+	}
 
 	/**
 	 * Thin wrapper for {@link #process(String[], Integer)}. 
@@ -20,12 +27,12 @@ public class Modulus implements CharFunction {
 	 */
 	public float process(Character[] input, Object...params) {
 		if (params == null || params.length == 0) {
-			throw new InvalidParameterException("At least one parameter was expected.");
+			throw new IllegalArgumentException("At least one parameter was expected.");
 		}
 		if (params[0] instanceof Integer) {
 			return process(input, (Integer) params[0]);
 		} else {
-			throw new InvalidParameterException("The first parameter must be an Integer.");
+			throw new IllegalArgumentException("The first parameter must be an Integer.");
 		}
 	}
 	
@@ -40,31 +47,29 @@ public class Modulus implements CharFunction {
 	 * 
 	 * @return a number between 0.0f and 1.0f 
 	 */
-	public float process(Character[] input, Integer mod) {
+	public float process(final Character[] input, final Integer mod) {
 		if (input == null || input.length == 0) {
-			throw new InvalidParameterException("At least one character must be passed in.");
+			throw new IllegalArgumentException("At least one character must be passed in.");
 		}
 		
 		if (mod <= 0) {
-			throw new InvalidParameterException("Modulo needs to be greater then 0.");
+			throw new IllegalArgumentException("Modulo needs to be greater then 0.");
 		}
 		
 		int aggregator = 0;
 		
 		for (Character c : input) {
-			byte[] b = c.toString().getBytes();
+			byte[] b = String.valueOf(c).getBytes();
 			for (int a = 0; a < b.length; a++) {
 				aggregator |= (b[a] << (8*a)); 
 			}
-			if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Modulo: {0} % {1}",
-					new Object[]{aggregator, mod});
 			aggregator %= mod;
+			b = null;
 		}
 		
 		float q = (float) aggregator / (float) (mod - 1);
 		
-		if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Modulo: {0} / {1} = {2}",
-				new Object[]{aggregator, mod, q});
+		//if (plugin().config().isDebug()) plugin().log(Level.INFO,"Modulo: {0} / {1} = {2}", aggregator, mod, q);
 		
 		return q;
 		

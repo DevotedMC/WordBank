@@ -28,9 +28,13 @@ public class WordBankConfig {
 	private CharConfig[] word_config;
 	private String makers_mark;
 	private boolean debug;
+	private WordBank plugin;
 	
 	public WordBankConfig(ConfigurationSection config) throws InvalidPluginException {
-		
+		this(config, null);
+	}
+	public WordBankConfig(ConfigurationSection config, WordBank plugin) throws InvalidPluginException {
+		this.plugin = plugin;
 		int actual_config_level = config.getInt("configuration_file_version", -1);
 		if (actual_config_level < 0 || actual_config_level > WordBankConfig.expected_config_level) {
 			throw new org.bukkit.plugin.InvalidPluginException("Invalid configuration file");
@@ -40,12 +44,12 @@ public class WordBankConfig {
 		this.debug = config.getBoolean("debug", false);
 		
 		try (InputStream words = new FileInputStream(
-				new File(WordBank.instance().getDataFolder(),config.getString("wordlist_file")))) {
+				new File(plugin().getDataFolder(),config.getString("wordlist_file")))) {
 			this.words = new WordList(words);
 		} catch (IOException e) {
-			WordBank.log().log(Level.SEVERE, "Failed to load word list.", e);
+			plugin().logger().log(Level.SEVERE, "Failed to load word list.", e);
 		} catch (NullPointerException npe) {
-			WordBank.log().log(Level.SEVERE, "Failed to load word list.", npe);
+			plugin().logger().log(Level.SEVERE, "Failed to load word list.", npe);
 		}
 		
 		this.activation_length = config.getInt("activation_length", 10);
@@ -78,6 +82,10 @@ public class WordBankConfig {
 			this.db_config.addDataSourceProperty("prepStmtCacheSize", "10");
 			this.db_config.addDataSourceProperty("prepStmtCacheSqlLimit", "256");
 		}
+	}
+	
+	protected WordBank plugin() {
+		return this.plugin == null ? WordBank.instance() : this.plugin; 
 	}
 
 	public WordList getWords() {

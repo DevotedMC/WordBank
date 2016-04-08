@@ -21,7 +21,15 @@ import com.programmerdan.minecraft.wordbank.WordBank;
  * @author ProgrammerDan
  *
  */
-public class HashMap implements CharFunction {
+public class HashMap extends CharFunction {
+	
+	public HashMap() {
+		super(null);
+	}
+	
+	public HashMap(WordBank plugin) {
+		super(plugin);
+	}
 
 	/**
 	 * Thin wrapper for {@link #process(String[])}. 
@@ -71,9 +79,9 @@ public class HashMap implements CharFunction {
 			BigDecimal maxD = new BigDecimal(max);
 			BigDecimal valD = new BigDecimal(val);
 
-			float q = valD.divide(maxD, 10, RoundingMode.HALF_EVEN).floatValue();
-			if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Hash: {0} / {1} = {2}",
-					new Object[]{valD.toPlainString(), maxD.toPlainString(), q});
+			float q = valD.divide(maxD, 10, RoundingMode.HALF_UP).floatValue();
+			/*if (plugin().config().isDebug()) plugin().log(Level.INFO,"Hash: {0} / {1} = {2}",
+					valD.toPlainString(), maxD.toPlainString(), q);*/
 			return q;
 		} catch (NoSuchAlgorithmException e) {
 			throw new IllegalArgumentException("Failed to instantiate cryptographic function " + param, e);

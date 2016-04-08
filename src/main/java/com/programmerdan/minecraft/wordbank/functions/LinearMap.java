@@ -21,7 +21,15 @@ import com.programmerdan.minecraft.wordbank.WordBank;
  * @author ProgrammerDan
  *
  */
-public class LinearMap implements CharFunction {
+public class LinearMap extends CharFunction {
+
+	public LinearMap() {
+		super(null);
+	}
+	
+	public LinearMap(WordBank plugin) {
+		super(plugin);
+	}
 
 	/**
 	 * Thin wrapper for {@link #process(String[])}. 
@@ -71,7 +79,7 @@ public class LinearMap implements CharFunction {
 		BigDecimal valD = new BigDecimal(val);
 		
 		float q = valD.divide(maxD, 10, RoundingMode.HALF_EVEN).floatValue();
-		if (WordBank.config().isDebug()) WordBank.log().log(Level.INFO,"Linear: {0} / {1} = {2}",
+		if (plugin().config().isDebug()) plugin().logger().log(Level.INFO,"Linear: {0} / {1} = {2}",
 				new Object[]{valD.toPlainString(), maxD.toPlainString(), q});
 		return q;
 	}

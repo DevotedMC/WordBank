@@ -33,7 +33,7 @@ public class CommandListener implements CommandExecutor {
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		int page = 0;
+		int page = 1;
 		int count = 15;
 		
 		String key = null;
@@ -52,12 +52,12 @@ public class CommandListener implements CommandExecutor {
 				
 				key = StringUtils.join(Arrays.copyOfRange(args, 0, args.length - 1), " ");
 			} catch (NumberFormatException nfe) {
-				page = 0;
+				page = 1;
 				key = StringUtils.join(Arrays.copyOf(args, args.length), " ");
 			}
 		}
 		
-		if (page < 0 || (key != null && key.length() != plugin().config().getActivationLength())) {
+		if (page < 1 || (key != null && key.length() != plugin().config().getActivationLength())) {
 			return false;
 		}
 		
@@ -70,7 +70,7 @@ public class CommandListener implements CommandExecutor {
 				Connection connection = plugin().data().getConnection();
 				PreparedStatement statement = connection.prepareStatement(WordBankData.keys);
 				statement.setInt(1, count);
-				statement.setInt(2, page * count);
+				statement.setInt(2, (page - 1) * count);
 				ResultSet rs = statement.executeQuery();
 				sender.sendMessage(String.format("Listing all keys:    %s(Page %d)",
 						ChatColor.BLUE, page));
@@ -92,7 +92,7 @@ public class CommandListener implements CommandExecutor {
 				PreparedStatement statement = connection.prepareStatement(WordBankData.key);
 				statement.setString(1, key);
 				statement.setInt(2, count);
-				statement.setInt(3, page * count);
+				statement.setInt(3, (page - 1) * count);
 				ResultSet rs = statement.executeQuery();
 				sender.sendMessage(String.format("Listing key %s:    %s(Page %d)",
 						key, ChatColor.BLUE, page));

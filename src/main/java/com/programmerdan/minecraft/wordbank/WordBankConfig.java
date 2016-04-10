@@ -29,6 +29,7 @@ public class WordBankConfig {
 	private String makers_mark;
 	private boolean debug;
 	private WordBank plugin;
+	private long confirm_delay;
 	
 	public WordBankConfig(ConfigurationSection config) throws InvalidPluginException {
 		this(config, null);
@@ -64,6 +65,8 @@ public class WordBankConfig {
 		for (int a = 0; a < this.word_max; a++) {
 			this.word_config[a] = new CharConfig(config.getConfigurationSection("word." + a), activation_length);
 		}
+		
+		this.confirm_delay = config.getLong("confirm_delay");
 		// dbconfig 
 		this.db_config = null;
 		ConfigurationSection db = config.getConfigurationSection("db");
@@ -129,6 +132,10 @@ public class WordBankConfig {
 	
 	public String getMakersMark() {
 		return makers_mark;
+	}
+	
+	public long getConfirmDelay() {
+		return confirm_delay;
 	}
 
 	public boolean isDebug() {

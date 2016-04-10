@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
@@ -21,6 +22,8 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import com.programmerdan.minecraft.wordbank.WordBank;
 import com.programmerdan.minecraft.wordbank.data.WordBankData;
@@ -35,11 +38,15 @@ import com.programmerdan.minecraft.wordbank.util.NameConstructor;
  */
 public class ActionListener implements Listener {
 	private WordBank plugin;
+	
+	private HashMap<UUID, BukkitTask> pendingMarks;
+	
 	public ActionListener() {
-		plugin = null;
+		this(null);
 	}
 	public ActionListener(WordBank plugin) {
 		this.plugin = plugin;
+		pendingMarks = new HashMap<UUID, BukkitTask>();
 	}
 	
 	protected WordBank plugin() {
@@ -80,67 +87,93 @@ public class ActionListener implements Listener {
 			// Let's check if the player can pay his dues.
 			Inventory pInv = event.getPlayer().getInventory();
 			if (pInv.containsAtLeast(plugin().config().getCost(), plugin().config().getCost().getAmount())) {
-				HashMap<Integer, ItemStack> incomplete = pInv.removeItem(plugin().config().getCost());
-				if (incomplete != null && !incomplete.isEmpty()) {
-					if (plugin().config().isDebug()) plugin().logger().info("  - lacks enough to pay for it");
-					
-					for (Map.Entry<Integer, ItemStack> cleanup : incomplete.entrySet()) {
-						pInv.addItem(cleanup.getValue());
-						// ignore overflow?
-					}
-				} else {
-					try {
-						if (plugin().config().isDebug()) plugin().logger().info("  - Paid and updating item");
-						
-						if (curName.length() > plugin().config().getActivationLength()) {
-							curName = curName.substring(0, plugin().config().getActivationLength());
-						} else if (curName.length() < plugin().config().getActivationLength()) {
-							int diff = plugin().config().getActivationLength() - curName.length();
-							curName = curName.concat( new String(new char[diff])
-									.replaceAll("\0", plugin().config().getPadding()));
-						}
-						String newName = NameConstructor.buildName(curName, true);
-						
-						if (plugin().config().isDebug()) plugin().logger().log(
-								Level.INFO, "  - Using key {0} to generate {1}", 
-								new Object[]{curName, newName});
+				final UUID puid = event.getPlayer().getUniqueId();
+				BukkitTask firstHit = pendingMarks.get(puid);
+				if (firstHit == null) {
+					long confirmDelay = plugin().config().getConfirmDelay();
+				
+					plugin().logger().log(Level.INFO, "Pending a mark for player {0}", puid);
+					event.getPlayer().sendMessage(String.format("Hit the table a second time in the next %d seconds to confirm renaming using %s.",
+							confirmDelay, curName));
 
-						meta.setDisplayName(newName);
-						ArrayList<String> lore = new ArrayList<String>();
-						lore.add(plugin().config().getMakersMark());
-						meta.setLore(lore);
-						item.setItemMeta(meta);
-						
-						event.getPlayer().sendMessage(String.format("%sApplied a new %s of %s %sto the %s",
-								ChatColor.WHITE, plugin().config().getMakersMark(), 
-								meta.getDisplayName(), ChatColor.WHITE,
-								item.getType().toString()));
-						
-						if (plugin().config().hasDB()) {
-							try {
-								if (plugin().config().isDebug()) plugin().logger().info("  - Inserting item record");
-								Connection connection = plugin().data().getConnection();
-								PreparedStatement insert = connection.prepareStatement(WordBankData.insert);
-								insert.setString(1, curName);
-								insert.setString(2, event.getPlayer().getUniqueId().toString());
-								insert.setString(3, item.getType().toString());
-								insert.setString(4, newName);
-								insert.executeUpdate();
-								insert.close();
-								connection.close();
-							} catch (SQLException se) {
-								plugin().logger().log(Level.WARNING, "Failed to insert key utilization", se);
+					pendingMarks.put(puid, 
+						new BukkitRunnable() {
+							@Override
+							public void run() {
+								pendingMarks.remove(puid);
 							}
+						}.runTaskLater(plugin(), confirmDelay)
+					);
+					event.setCancelled(true);
+					return;
+				} else {
+					HashMap<Integer, ItemStack> incomplete = pInv.removeItem(plugin().config().getCost());
+					if (incomplete != null && !incomplete.isEmpty()) {
+						if (plugin().config().isDebug()) plugin().logger().info("  - lacks enough to pay for it");
+						
+						for (Map.Entry<Integer, ItemStack> cleanup : incomplete.entrySet()) {
+							pInv.addItem(cleanup.getValue());
+							// ignore overflow?
 						}
-					} catch (Exception e) {
-						plugin().logger().log(Level.WARNING, "Something went very wrong while renaming", e);
-						event.getPlayer().sendMessage(String.format("Mystic renaming of %s has %sfailed%s. %sPlease report via /helpop.",
-								item.getType().toString(), ChatColor.ITALIC, ChatColor.RESET, ChatColor.AQUA));
-						// no refund to prevent gaming of glitches
+					} else {
+						firstHit.cancel();
+						pendingMarks.remove(puid);
+						
+						try {
+							if (plugin().config().isDebug()) plugin().logger().info("  - Paid and updating item");
+							
+							if (curName.length() > plugin().config().getActivationLength()) {
+								curName = curName.substring(0, plugin().config().getActivationLength());
+							} else if (curName.length() < plugin().config().getActivationLength()) {
+								int diff = plugin().config().getActivationLength() - curName.length();
+								curName = curName.concat( new String(new char[diff])
+										.replaceAll("\0", plugin().config().getPadding()));
+							}
+							String newName = NameConstructor.buildName(curName, true);
+							
+							if (plugin().config().isDebug()) plugin().logger().log(
+									Level.INFO, "  - Using key {0} to generate {1}", 
+									new Object[]{curName, newName});
+	
+							meta.setDisplayName(newName);
+							ArrayList<String> lore = new ArrayList<String>();
+							lore.add(plugin().config().getMakersMark());
+							meta.setLore(lore);
+							item.setItemMeta(meta);
+							
+							event.getPlayer().sendMessage(String.format("%sApplied a new %s of %s %sto the %s",
+									ChatColor.WHITE, plugin().config().getMakersMark(), 
+									meta.getDisplayName(), ChatColor.WHITE,
+									item.getType().toString()));
+							
+							if (plugin().config().hasDB()) {
+								try {
+									if (plugin().config().isDebug()) plugin().logger().info("  - Inserting item record");
+									Connection connection = plugin().data().getConnection();
+									PreparedStatement insert = connection.prepareStatement(WordBankData.insert);
+									insert.setString(1, curName);
+									insert.setString(2, event.getPlayer().getUniqueId().toString());
+									insert.setString(3, item.getType().toString());
+									insert.setString(4, newName);
+									insert.executeUpdate();
+									insert.close();
+									connection.close();
+								} catch (SQLException se) {
+									plugin().logger().log(Level.WARNING, "Failed to insert key utilization", se);
+								}
+							}
+						} catch (Exception e) {
+							plugin().logger().log(Level.WARNING, "Something went very wrong while renaming", e);
+							event.getPlayer().sendMessage(String.format("Mystic renaming of %s has %sfailed%s. %sPlease report via /helpop.",
+									item.getType().toString(), ChatColor.ITALIC, ChatColor.RESET, ChatColor.AQUA));
+							// no refund to prevent gaming of glitches
+						}
 					}
+					event.setCancelled(true);
 					return;
 				}
 			}
+			event.setCancelled(true);
 			event.getPlayer().sendMessage(String.format("%sYou need %d of %s to create a %s",
 					ChatColor.RED, plugin().config().getCost().getAmount(),
 					plugin().config().getCost().getType().toString(),

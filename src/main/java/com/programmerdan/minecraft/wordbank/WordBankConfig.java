@@ -66,7 +66,8 @@ public class WordBankConfig {
 			this.word_config[a] = new CharConfig(config.getConfigurationSection("word." + a), activation_length);
 		}
 		
-		this.confirm_delay = config.getLong("confirm_delay");
+		this.confirm_delay = config.getLong("confirm_delay", 10000l);
+		
 		// dbconfig 
 		this.db_config = null;
 		ConfigurationSection db = config.getConfigurationSection("db");

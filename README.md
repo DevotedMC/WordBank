@@ -9,7 +9,8 @@ A tool for branding and unique imprinting.
 The premise is simple. 
 
 Using the anvil, name a tool, item, book, stack of potatos whatever. Give it a string of around 10 characters (configurable) as its name, like `1kZ9dlkPPe`. Then take it to an enchanting table, and right-click the 
-table with the item. That seemingly random string of letters and numbers will be magically transformed into a
+table with the item. You'll be asked to confirm; hit it a second time to confirm.
+That seemingly random string of letters and numbers will be magically transformed into a
 unique, colored name, at the small cost of 10XP (configurable!). It will have between one and three
 (configurable!) words as a result. The item will also never be able to be renamed, ever again. 
 
@@ -111,6 +112,8 @@ An accidental discovery, this produces a "two-tailed" distribution. Meaning, it 
 It also requires a single `function_terms` indicating the MessageDigest function to use.
 
 ### Other options
+
+`confirm_delay:` This is the max amount of time to wait for someone to confirm their desire to rename.
 
 `cost:` This is a Bukkit "ConfigurationSerializable" representation of an in-game item. An example:
 

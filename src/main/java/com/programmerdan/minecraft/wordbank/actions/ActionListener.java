@@ -94,7 +94,7 @@ public class ActionListener implements Listener {
 				
 					plugin().logger().log(Level.INFO, "Pending a mark for player {0}", puid);
 					event.getPlayer().sendMessage(String.format("Hit the table a second time in the next %d seconds to confirm renaming using %s.",
-							confirmDelay, curName));
+							confirmDelay / 1000l, curName));
 
 					pendingMarks.put(puid, 
 						new BukkitRunnable() {
@@ -102,7 +102,7 @@ public class ActionListener implements Listener {
 							public void run() {
 								pendingMarks.remove(puid);
 							}
-						}.runTaskLater(plugin(), confirmDelay)
+						}.runTaskLater(plugin(), confirmDelay / 50l); // convert to ticks
 					);
 					event.setCancelled(true);
 					return;

@@ -102,7 +102,7 @@ public class ActionListener implements Listener {
 							public void run() {
 								pendingMarks.remove(puid);
 							}
-						}.runTaskLater(plugin(), confirmDelay / 50l); // convert to ticks
+						}.runTaskLater(plugin(), confirmDelay / 50l) // convert to ticks
 					);
 					event.setCancelled(true);
 					return;

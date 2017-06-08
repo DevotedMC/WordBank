@@ -6,7 +6,7 @@
   <groupId>com.programmerdan.minecraft</groupId>
   <artifactId>WordBank</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.2</version>
+  <version>1.1.0</version>
   <name>WordBank</name>
   <url>https://github.com/DevotedMC/WordBank</url>
   
@@ -16,8 +16,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.5.1</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>1.8</source>
+          <target>1.8</target>
           <compilerArgument></compilerArgument>
         </configuration>
       </plugin>
@@ -65,13 +65,13 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot-api</artifactId>
-      <version>1.10-R0.1-SNAPSHOT</version>
+      <version>1.12-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
-      <version>2.4.5</version>
+      <version>2.6.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

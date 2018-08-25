@@ -18,7 +18,8 @@ db:
   password: ''
 cost:
   ==: org.bukkit.inventory.ItemStack
-  type: EXP_BOTTLE
+  type: EXPERIENCE_BOTTLE
+  v: 1
   amount: 10
 color:
   chars: [9, 9]

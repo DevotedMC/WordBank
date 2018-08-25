@@ -62,7 +62,7 @@ public class ActionListener implements Listener {
 		if (plugin().config().isDebug()) plugin().logger().info("  - has player");
 		
 		Block target = event.getClickedBlock();
-		if (target == null || target.getType() != Material.ENCHANTMENT_TABLE) return;
+		if (target == null || target.getType() != Material.ENCHANTING_TABLE) return;
 		if (plugin().config().isDebug()) plugin().logger().info("  - is touch Enchantment Table");
 		
 		// no item or item has no custom data

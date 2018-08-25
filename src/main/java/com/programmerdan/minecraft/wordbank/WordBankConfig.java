@@ -41,7 +41,7 @@ public class WordBankConfig {
 			throw new org.bukkit.plugin.InvalidPluginException("Invalid configuration file");
 		}
 		
-		this.cost = config.getItemStack("cost", new ItemStack(Material.EXP_BOTTLE, 10));
+		this.cost = config.getItemStack("cost", new ItemStack(Material.EXPERIENCE_BOTTLE, 10));
 		this.debug = config.getBoolean("debug", false);
 		
 		try (InputStream words = new FileInputStream(

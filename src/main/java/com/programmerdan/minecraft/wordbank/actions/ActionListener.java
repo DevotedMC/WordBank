@@ -136,7 +136,12 @@ public class ActionListener implements Listener {
 									new Object[]{curName, newName});
 	
 							meta.setDisplayName(newName);
-							ArrayList<String> lore = new ArrayList<String>();
+							ArrayList<String> lore;
+							if (meta.hasLore()){
+                				lore = (ArrayList<String>)meta.getLore();
+            				} else {
+                				lore = new ArrayList<String>();
+            				}
 							lore.add(plugin().config().getMakersMark());
 							meta.setLore(lore);
 							item.setItemMeta(meta);

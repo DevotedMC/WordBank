@@ -28,7 +28,10 @@ public class NameConstructor {
 	/**
 	 * Expansion for {@link #buildName(String, boolean)} allowing specification of WordBank instance.
 	 * 
+	 * @param key The character sequence used to construct a WordBank name.
+	 * @param mark Marks storage, currently ignored
 	 * @param plugin the WordBank instance to use. Good for unit testing.
+	 * @return the converted key.
 	 */
 	public static String buildName(String key, boolean mark, WordBank plugin) {
 		// TODO: add mark storage; mark is ignored for now, tbd.

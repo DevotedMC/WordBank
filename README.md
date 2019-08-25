@@ -23,7 +23,7 @@ final brand name from the "key", or input string.
 
 A word of warning, however. Changing any of the knobs post-deployment will definitely break prior discovered "brands". I strongly recommend you test your config extensively before deploying this, to be sure it does as you desire.
 
-###That said, the knobs:
+### That said, the knobs:
 
 First, the actual expected # of characters, controlled by `activation_length` in the config, determines
 the actual number of letters that are used in key computation.
@@ -67,11 +67,11 @@ You could also write your own function; see the references for details.
 
 Choose wisely. No turning back once live.
 
-####`com.programmerdan.minecraft.wordbank.functions.LinearMap`
+#### `com.programmerdan.minecraft.wordbank.functions.LinearMap`
 
 Not even sure this is worth using, but it constructs a large bit sequence, and divides that into the maximum positive bitsequence of the same size, to produce a number between 0.0 and 1.0. It requires no `function_terms` at all.
 
-####`com.programmerdan.minecraft.wordbank.functions.Modulus`
+#### `com.programmerdan.minecraft.wordbank.functions.Modulus`
 
 Slightly broken as demonstrated by my unit tests; it doesn't always return all possible values under the modulus transform. That said it uses an aggregation % modulo strategy to produce a small-ish number which gets divided into the `modulo - 1`. 
 
@@ -85,7 +85,7 @@ Example:
       function_terms:
        - 16 
 
-####`com.programmerdan.minecraft.wordbank.functions.HashMap`
+#### `com.programmerdan.minecraft.wordbank.functions.HashMap`
 
 This is straightforward one-way cryptographic transform. It maps the selected byte data of the characters defined in `chars` to a byte array, which is passed through a `MessageDigest` hash function. The result should be a psuedo-uniform value between `0` and `1`.
 
@@ -99,13 +99,13 @@ Example:
       function_terms:
        - SHA-1
 
-####`com.programmerdan.minecraft.wordbank.functions.NormalDistribution`
+#### `com.programmerdan.minecraft.wordbank.functions.NormalDistribution`
 
 This is a bit trickier to explain, but by some math magic, this transforms the _uniform_ distribution of `HashMap` into an approximately _normal_ or _Gaussian_ distribution, with the mean right around `0.5`. In other words, this function tends to generate values close to `0.5` and less often close to `0` or `1`.
 
 It also requires a single `function_terms` indicating the MessageDigest function to use.
 
-####`com.programmerdan.minecraft.wordbank.functions.TwoTailDistribution`
+#### `com.programmerdan.minecraft.wordbank.functions.TwoTailDistribution`
 
 An accidental discovery, this produces a "two-tailed" distribution. Meaning, it prefers to generate values near `0` or `1` and tends not to produce values close to `0.5`. Mathematically, it's a kind of "opposite" of `NormalDistribution`.
 

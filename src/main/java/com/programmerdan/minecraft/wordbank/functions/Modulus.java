@@ -22,7 +22,7 @@ public class Modulus extends CharFunction {
 	}
 
 	/**
-	 * Thin wrapper for {@link #process(String[], Integer)}. 
+	 * Thin wrapper for {@link #process(Character[], Integer)}. 
 	 * See it for details.
 	 */
 	public float process(Character[] input, Object...params) {
@@ -38,9 +38,9 @@ public class Modulus extends CharFunction {
 	
 	/**
 	 * This one is a little strange. Takes the bytes of the character input, aggregates them
-	 * in reconstructed bit order, and takes the modulo to base {@param mod} at each pass. This
-	 * ensures that the final number is between 0 and {@param mod}. Consequently, the result is
-	 * mapped between 0.0f and 1.0f by dividing the result over {@param mod}.
+	 * in reconstructed bit order, and takes the modulo to base {@code mod} at each pass. This
+	 * ensures that the final number is between 0 and {@code mod}. Consequently, the result is
+	 * mapped between 0.0f and 1.0f by dividing the result over {@code mod}.
 	 * 
 	 * @param input The characters to use in the mapping
 	 * @param mod The modulo to suppress by

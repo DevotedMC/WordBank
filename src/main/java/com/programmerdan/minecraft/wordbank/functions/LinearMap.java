@@ -32,7 +32,7 @@ public class LinearMap extends CharFunction {
 	}
 
 	/**
-	 * Thin wrapper for {@link #process(String[])}. 
+	 * Thin wrapper for {@link #process(Character[])}. 
 	 * See it for details.
 	 */
 	public float process(Character[] input, Object...params) {

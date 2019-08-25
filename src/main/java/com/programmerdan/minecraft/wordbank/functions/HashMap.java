@@ -32,7 +32,7 @@ public class HashMap extends CharFunction {
 	}
 
 	/**
-	 * Thin wrapper for {@link #process(String[])}. 
+	 * Thin wrapper for {@link #process(Character[], String)}. 
 	 * See it for details.
 	 */
 	public float process(Character[] input, Object...params) {

@@ -36,6 +36,9 @@ public class WordBankData {
 			"SELECT uuid, count(*) AS cnt, count(DISTINCT target) AS targets " +
 			"  FROM wordbank_utilization WHERE wbkey = ? GROUP BY uuid LIMIT ? OFFSET ?;";
 	
+	public static final String getvalue =
+			"SELECT wbkey, wbname AS val FROM wordbank_utilization WHERE wbkey = ? LIMIT 1;";
+	
 	private HikariDataSource datasource;
 	
 	private WordBank plugin;

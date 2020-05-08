@@ -30,6 +30,9 @@ public class WordBankConfig {
 	private boolean debug;
 	private WordBank plugin;
 	private long confirm_delay;
+	private boolean fail_rename_on_db_error;
+	private int namecache_invalidate_minutes;
+	private int namecache_max_size;
 	
 	public WordBankConfig(ConfigurationSection config) throws InvalidPluginException {
 		this(config, null);
@@ -67,6 +70,14 @@ public class WordBankConfig {
 		}
 		
 		this.confirm_delay = config.getLong("confirm_delay", 10000l);
+		
+		// true if, should the database be enabled AND throw an exception when
+		// getting a value for a key name, wordbank should skip trying to generate
+		// a new value for that key (prevents possible ambiguity in names if
+		// the configs change and the che cache can't access the database)
+		this.fail_rename_on_db_error = config.getBoolean("fail_rename_on_db_error", true);
+		this.namecache_invalidate_minutes = config.getInt("namecache_invalidate_minutes", 5);
+		this.namecache_max_size = config.getInt("namecache_max_size", 500);
 		
 		// dbconfig 
 		this.db_config = null;
@@ -149,5 +160,17 @@ public class WordBankConfig {
 	
 	public HikariConfig database() {
 		return this.db_config;
+	}
+	
+	public boolean isFailRenameOnDbError() {
+		return fail_rename_on_db_error;
+	}
+	
+	public int getNamecacheInvalidateMinutes() {
+		return namecache_invalidate_minutes;
+	}
+	
+	public int getNamecacheMaxSize() {
+		return namecache_max_size;
 	}
 }

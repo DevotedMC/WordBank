@@ -33,6 +33,7 @@ public class WordBankConfig {
 	private boolean fail_rename_on_db_error;
 	private int namecache_invalidate_minutes;
 	private int namecache_max_size;
+	private boolean force_mark_all_renames;
 	
 	public WordBankConfig(ConfigurationSection config) throws InvalidPluginException {
 		this(config, null);
@@ -78,6 +79,7 @@ public class WordBankConfig {
 		this.fail_rename_on_db_error = config.getBoolean("fail_rename_on_db_error", true);
 		this.namecache_invalidate_minutes = config.getInt("namecache_invalidate_minutes", 5);
 		this.namecache_max_size = config.getInt("namecache_max_size", 500);
+		this.force_mark_all_renames = config.getBoolean("force_mark_all_renames", false);
 		
 		// dbconfig 
 		this.db_config = null;
@@ -172,5 +174,9 @@ public class WordBankConfig {
 	
 	public int getNamecacheMaxSize() {
 		return namecache_max_size;
+	}
+	
+	public boolean getForceMarkAllRenames() {
+		return force_mark_all_renames;
 	}
 }

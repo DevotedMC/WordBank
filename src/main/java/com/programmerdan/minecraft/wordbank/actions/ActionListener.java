@@ -1,9 +1,6 @@
 package com.programmerdan.minecraft.wordbank.actions;
 
 import com.programmerdan.minecraft.wordbank.NameRecord;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -180,7 +177,7 @@ public class ActionListener implements Listener {
 							// force=true for... logging purposes? to the database for some reason?
 							// why does it need player UUID and item type just to keep a unique key/value?
 							Bukkit.getScheduler().runTaskAsynchronously(plugin(), () -> {
-								newNameRecord.mark(plugin(), event.getPlayer().getUniqueId().toString(), item.getType().toString(), true);
+								newNameRecord.mark(plugin(), event.getPlayer().getUniqueId().toString(), item.getType().toString(), plugin().config().getForceMarkAllRenames());
 							});
 						} catch (Exception e) {
 							plugin().logger().log(Level.WARNING, "Something went very wrong while renaming", e);

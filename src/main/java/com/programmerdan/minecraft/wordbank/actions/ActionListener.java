@@ -37,7 +37,7 @@ import org.bukkit.Bukkit;
 public class ActionListener implements Listener {
 	private WordBank plugin;
 	
-	private HashMap<UUID, BukkitTask> pendingMarks;
+	private HashMap<UUID, PendingMarkTask> pendingMarks;
 	
 	public ActionListener() {
 		this(null);
@@ -87,7 +87,7 @@ public class ActionListener implements Listener {
 			Inventory pInv = event.getPlayer().getInventory();
 			if (pInv.containsAtLeast(plugin().config().getCost(), plugin().config().getCost().getAmount())) {
 				final UUID puid = event.getPlayer().getUniqueId();
-				BukkitTask firstHit = pendingMarks.get(puid);
+				PendingMarkTask firstHit = pendingMarks.get(puid);
 				
 				// moved this out of if/else so the proper length name is used in
 				// both code blocks rather than just one (required by cache)
@@ -106,14 +106,9 @@ public class ActionListener implements Listener {
 					event.getPlayer().sendMessage(String.format("Hit the table a second time in the next %d seconds to confirm renaming using %s.",
 							confirmDelay / 1000l, unmodifiedName));
 
-					pendingMarks.put(puid, 
-						new BukkitRunnable() {
-							@Override
-							public void run() {
-								pendingMarks.remove(puid);
-							}
-						}.runTaskLater(plugin(), confirmDelay / 50l) // convert to ticks
-					);
+					PendingMarkTask task = new PendingMarkTask(puid, curName);
+					task.runTaskLater(plugin(), confirmDelay / 50l); // convert to ticks
+					pendingMarks.put(puid, task);
 					
 					// Schedule ASYNC task to load and cache the mapped name
 					// Do it now so it'll be ready when the player clicks again
@@ -121,7 +116,10 @@ public class ActionListener implements Listener {
 						final String finalCurName = curName;
 						Bukkit.getScheduler().runTaskAsynchronously(plugin(), () -> {
 							try {
-								System.out.println(plugin().nameCache().get(finalCurName).value);
+								NameRecord record = plugin().nameCache().get(finalCurName);
+								if (plugin().config().isDebug()) plugin().logger().log(
+										Level.INFO, "  - Used key {0} to load/generate {1}", 
+										new Object[]{record.key, record.value});
 							} catch (ExecutionException e) {
 
 							}
@@ -131,6 +129,31 @@ public class ActionListener implements Listener {
 					event.setCancelled(true);
 					return;
 				} else {
+					NameRecord newNameRecord = plugin().nameCache().getIfPresent(firstHit.key);
+					// Original queued name does NOT match current item's name
+					if (!curName.equals(firstHit.key)) {
+						if (newNameRecord == null && plugin().config().isPreventDBLookupSpam()) {
+							event.getPlayer().sendMessage(String.format("%sThat doesn't match the name you queued. %sWait for the queued name %sto finish loading before trying another name.", ChatColor.RED, ChatColor.GRAY, ChatColor.RED));
+						} else {
+							event.getPlayer().sendMessage(String.format("%sThat doesn't match the name you queued. %sClick again %sto queue the new name.", ChatColor.RED, ChatColor.GRAY, ChatColor.RED));
+							firstHit.cancel();
+							pendingMarks.remove(firstHit.puid);
+						}
+						event.setCancelled(true);
+						return;
+					}
+					if (newNameRecord == null) {
+						event.getPlayer().sendMessage(String.format("%sThat name is still loading (or there was an error), wait a few seconds.", ChatColor.RED));
+						event.setCancelled(true);
+						return;
+					} else {
+						// Move the task cancel here so spamming wordbank
+						// doesn't spawn crap tons of threads all blocking
+						// while waiting for the first cache load
+						firstHit.cancel();
+						pendingMarks.remove(puid);
+					}
+					
 					HashMap<Integer, ItemStack> incomplete = pInv.removeItem(plugin().config().getCost());
 					if (incomplete != null && !incomplete.isEmpty()) {
 						if (plugin().config().isDebug()) plugin().logger().info("  - lacks enough to pay for it");
@@ -144,22 +167,8 @@ public class ActionListener implements Listener {
 						try {
 							if (plugin().config().isDebug()) plugin().logger().info("  - Paid and updating item");
 							
-							NameRecord newNameRecord = plugin().nameCache().getIfPresent(curName);
-							
-							if (newNameRecord == null) {
-								event.getPlayer().sendMessage(String.format("%sThat name is still generating (or there was an error), wait a few seconds.", ChatColor.WHITE));
-								event.setCancelled(true);
-								return;
-							} else {
-								// Move the task cancel here so spamming wordbank
-								// doesn't spawn crap tons of threads all blocking
-								// while waiting for the first cache load
-								firstHit.cancel();
-								pendingMarks.remove(puid);
-							}
-							
 							if (plugin().config().isDebug()) plugin().logger().log(
-									Level.INFO, "  - Using key {0} to generate {1}", 
+									Level.INFO, "  - Used key {0} to generate {1}", 
 									new Object[]{curName, newNameRecord.value});
 	
 							meta.setDisplayName(newNameRecord.value);
@@ -177,7 +186,7 @@ public class ActionListener implements Listener {
 							// force=true for... logging purposes? to the database for some reason?
 							// why does it need player UUID and item type just to keep a unique key/value?
 							Bukkit.getScheduler().runTaskAsynchronously(plugin(), () -> {
-								newNameRecord.mark(plugin(), event.getPlayer().getUniqueId().toString(), item.getType().toString(), plugin().config().getForceMarkAllRenames());
+								newNameRecord.mark(plugin(), event.getPlayer().getUniqueId().toString(), item.getType().toString(), plugin().config().isDBLogAllItemMarks());
 							});
 						} catch (Exception e) {
 							plugin().logger().log(Level.WARNING, "Something went very wrong while renaming", e);
@@ -237,6 +246,24 @@ public class ActionListener implements Listener {
 		if (!resultMeta.hasDisplayName() || !resultMeta.getDisplayName().equals(meta0.getDisplayName())) {
 			resultMeta.setDisplayName(meta0.getDisplayName());
 			result.setItemMeta(resultMeta);
+		}
+	}
+	
+	private class PendingMarkTask extends BukkitRunnable {
+		public final UUID puid;
+		public final String key;
+		
+		public PendingMarkTask(UUID puid, String key) {
+			this.puid = puid;
+			this.key = key;
+		}
+		
+		@Override
+		public void run() {
+			PendingMarkTask task = pendingMarks.get(puid);
+			if (this == task) {
+				pendingMarks.remove(puid);
+			}
 		}
 	}
 }

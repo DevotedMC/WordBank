@@ -33,7 +33,8 @@ public class WordBankConfig {
 	private boolean fail_rename_on_db_error;
 	private int namecache_invalidate_minutes;
 	private int namecache_max_size;
-	private boolean force_mark_all_renames;
+	private boolean dblog_all_item_marks;
+	private boolean prevent_dblookup_spam;
 	
 	public WordBankConfig(ConfigurationSection config) throws InvalidPluginException {
 		this(config, null);
@@ -79,7 +80,16 @@ public class WordBankConfig {
 		this.fail_rename_on_db_error = config.getBoolean("fail_rename_on_db_error", true);
 		this.namecache_invalidate_minutes = config.getInt("namecache_invalidate_minutes", 5);
 		this.namecache_max_size = config.getInt("namecache_max_size", 500);
-		this.force_mark_all_renames = config.getBoolean("force_mark_all_renames", false);
+		// Before the change to use async load/generate, every time a player
+		// used wordbank to generate a name for an item, it added a new entry to
+		// the database regardless of whether an entry already existed with that
+		// wbkey. Setting this to true will keep that old behavior (for...
+		// counting number of times a name is used or something? idk)
+		this.dblog_all_item_marks = config.getBoolean("dblog_all_item_marks", false);
+		// Set to true if players are spamming wordbank too fast and slowing the
+		// database. Defaulting this to false for now since it *shouldn't* really
+		// be a big problem, but leaving the option there.
+		this.prevent_dblookup_spam = config.getBoolean("prevent_dblookup_spam", true);
 		
 		// dbconfig 
 		this.db_config = null;
@@ -176,7 +186,11 @@ public class WordBankConfig {
 		return namecache_max_size;
 	}
 	
-	public boolean getForceMarkAllRenames() {
-		return force_mark_all_renames;
+	public boolean isDBLogAllItemMarks() {
+		return dblog_all_item_marks;
+	}
+	
+	public boolean isPreventDBLookupSpam() {
+		return prevent_dblookup_spam;
 	}
 }

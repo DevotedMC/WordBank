@@ -9,6 +9,13 @@ padding: 'â'
 add_serial: false
 makers_mark: "Marked Item"
 debug: false
+namecache_invalidate_minutes: 5
+namecache_max_size: 500
+prevent_dblookup_spam: true
+# Generally leave this false to keep the database clean
+dblog_all_item_marks: false
+# Leave this true to prevent wordlist changes from <maybe> breaking old renames
+fail_rename_on_db_error: true
 db:
   driver: mysql
   host: localhost

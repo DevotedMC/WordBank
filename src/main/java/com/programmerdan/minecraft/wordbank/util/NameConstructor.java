@@ -1,6 +1,7 @@
 package com.programmerdan.minecraft.wordbank.util;
 
 import com.programmerdan.minecraft.wordbank.CharConfig;
+import com.programmerdan.minecraft.wordbank.NameRecord;
 import com.programmerdan.minecraft.wordbank.WordBank;
 
 /**
@@ -18,11 +19,10 @@ public class NameConstructor {
 	 * All these parts are joined and returned.
 	 * 
 	 * @param key The character sequence used to construct a WordBank name.
-	 * @param mark If true, save key as used; otherwise, do not.
 	 * @return The converted key.
 	 */
-	public static String buildName(String key, boolean mark) {
-		return buildName(key, mark, WordBank.instance());
+	public static NameRecord buildName(String key) {
+		return buildName(key, WordBank.instance());
 	}
 
 	/**
@@ -30,8 +30,7 @@ public class NameConstructor {
 	 * 
 	 * @param plugin the WordBank instance to use. Good for unit testing.
 	 */
-	public static String buildName(String key, boolean mark, WordBank plugin) {
-		// TODO: add mark storage; mark is ignored for now, tbd.
+	public static NameRecord buildName(String key, WordBank plugin) {
 		
 		// First, compute color.
 		float whichColor = executeConfig(plugin.config().getColor(), key);
@@ -51,7 +50,7 @@ public class NameConstructor {
 				));
 		}
 		
-		return name.toString();
+		return new NameRecord(key, name.toString(), false);
 	}
 	
 	public static float executeConfig(CharConfig conf, String key) {

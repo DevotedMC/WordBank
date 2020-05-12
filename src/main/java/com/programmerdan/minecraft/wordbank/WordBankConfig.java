@@ -87,8 +87,7 @@ public class WordBankConfig {
 		// counting number of times a name is used or something? idk)
 		this.dblog_all_item_marks = config.getBoolean("dblog_all_item_marks", false);
 		// Set to true if players are spamming wordbank too fast and slowing the
-		// database. Defaulting this to false for now since it *shouldn't* really
-		// be a big problem, but leaving the option there.
+		// database.
 		this.prevent_dblookup_spam = config.getBoolean("prevent_dblookup_spam", true);
 		
 		// dbconfig 

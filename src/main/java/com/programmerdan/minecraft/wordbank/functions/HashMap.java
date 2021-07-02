@@ -7,7 +7,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Vector;
-import java.util.logging.Level;
 
 import org.apache.commons.lang.ArrayUtils;
 

@@ -3,7 +3,7 @@ main: com.programmerdan.minecraft.wordbank.WordBank
 author: ProgrammerDan
 authors: []
 version: ${project.version}
-api-version: 1.13
+api-version: 1.17
 commands:
   wordbank:
     description: |

@@ -1,20 +1,19 @@
 package com.programmerdan.minecraft.wordbank.actions;
 
+import com.programmerdan.minecraft.wordbank.WordBank;
+import com.programmerdan.minecraft.wordbank.data.WordBankData;
+import org.apache.commons.lang3.StringUtils;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.logging.Level;
-
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-
-import com.programmerdan.minecraft.wordbank.WordBank;
-import com.programmerdan.minecraft.wordbank.data.WordBankData;
 
 public class CommandListener implements CommandExecutor {
 

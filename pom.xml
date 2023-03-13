@@ -70,11 +70,7 @@
 		<dependency>
 			<groupId>io.papermc.paper</groupId>
 			<artifactId>paper-api</artifactId>
-<<<<<<< HEAD
-			<version>1.18.2-R0.1-SNAPSHOT</version>
-=======
 			<version>1.19.2-R0.1-SNAPSHOT</version>
->>>>>>> d6e2985... 1.19.2
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

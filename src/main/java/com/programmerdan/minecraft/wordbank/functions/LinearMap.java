@@ -1,5 +1,9 @@
 package com.programmerdan.minecraft.wordbank.functions;
 
+import com.programmerdan.minecraft.wordbank.CharFunction;
+import com.programmerdan.minecraft.wordbank.WordBank;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -7,11 +11,6 @@ import java.security.InvalidParameterException;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Level;
-
-import org.apache.commons.lang.ArrayUtils;
-
-import com.programmerdan.minecraft.wordbank.CharFunction;
-import com.programmerdan.minecraft.wordbank.WordBank;
 
 /**
  * Fairly naive process that maps the character data onto a number whose bitlength depends on the

@@ -1,5 +1,9 @@
 package com.programmerdan.minecraft.wordbank.functions;
 
+import com.programmerdan.minecraft.wordbank.CharFunction;
+import com.programmerdan.minecraft.wordbank.WordBank;
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -7,11 +11,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Vector;
-
-import org.apache.commons.lang.ArrayUtils;
-
-import com.programmerdan.minecraft.wordbank.CharFunction;
-import com.programmerdan.minecraft.wordbank.WordBank;
 
 /**
  * Aggregates the bytes of the characters used as input and forms a message digest using those
